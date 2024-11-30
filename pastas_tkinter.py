@@ -1,4 +1,5 @@
 import tkinter as tk
+from shutil import posix
 from tkinter import messagebox
 import os
 
@@ -32,5 +33,7 @@ label_arquivo.pack(pady=5)
 entry_arquivo = tk.Entry(root, width=60)
 entry_arquivo.pack(pady=5)
 botao_criar = tk.Button(root,font="Arial", text="Criar Pasta e Ficheiro", command=criar_pasta_arquivo, bg="green")
+botao_criar.pack(pady=20)
+botao_criar = tk.Button(root,font="Arial", text="exit",width=10, command=lambda:root.quit())
 botao_criar.pack(pady=20)
 root.mainloop()
