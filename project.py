@@ -1,16 +1,13 @@
 import os
 from tkinter import Tk, filedialog, Button, Label, Listbox, END
+
 from pdf2image import convert_from_path
 from pytesseract import image_to_string
 from docx import Document
 from tkinter import messagebox
-
-# Certifique-se de que o Tesseract esteja instalado e configure o caminho, se necessário.
-# Exemplo (Windows): pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 import pytesseract
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"  # Altere conforme necessário
-
+pytesseract.pytesseract.tesseract_cmd = r"C:\Users\CTPAI - DIOGO DUARTE\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
 
 def convert_pdf_to_word(pdf_paths, output_dir):
     for pdf_path in pdf_paths:
