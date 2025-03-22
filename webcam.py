@@ -21,9 +21,12 @@ while True:
     image[height // 2:, width // 2:] = small_frame
 
     # Preencher a image com a frame redimensionada c/ rotações das small_frame's
-    ...
-
-    cv2.imshow('frame', image)
+    image[:height // 2, :width // 2] = small_frame # small frame "normal"
+    stretched_frame = cv2.resize(small_frame, (240, 320))
+    image[height // 2:, :width // 2] = cv2.rotate(stretched_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    image[:height // 2, width // 2:] = cv2.rotate(stretched_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    image[height // 2:, width // 2:] = cv2.rotate(small_frame, cv2.ROTATE_180)
+    cv2.imshow('4 webcam', image)
 
     if cv2.waitKey(1) == ord('q'):
         break
