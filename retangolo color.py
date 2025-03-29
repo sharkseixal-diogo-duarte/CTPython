@@ -29,10 +29,10 @@ while True:
     #image[:height // 2, width // 2:] = cv2.rotate(stretched_frame, cv2.ROTATE_90_CLOCKWISE)
     #image[height // 2:, width // 2:] = cv2.rotate(small_frame, cv2.ROTATE_180)
 
-    image[:height // 2, :width // 2] = cv2.rectangle(small_frame_1,(0, 0),(320, 240),(0, 0, 255),5)
-    image[height // 2:, :width // 2] = cv2.rectangle(small_frame_2,(160, 120),(255, 0, 0),-1)
-    image[:height // 2, width // 2:] = cv2.rectangle(small_frame_3, (0,0), (320,240), (0, 255, 0), 5)
-    image[height // 2:, width // 2:] = cv2.rectangle(small_frame_4,(100, 100),(200, 200),(0, 255, 0),5)
+    image[:height // 2, :width // 2] = cv2.rectangle(small_frame_1,(0, 0),(320, 240),(0, 0, 255),5) # vermelho
+    image[height // 2:, :width // 2] = cv2.rectangle(small_frame_2,(160, 120),(255, 0, 0),-1) # vede
+    image[:height // 2, width // 2:] = cv2.rectangle(small_frame_3, (0,0), (320,240), (0, 255, 0), 5) # azul
+    image[height // 2:, width // 2:] = cv2.rectangle(small_frame_4,(100, 100),(200, 200),(0, 255, 0),5) # amalero
 
 
 
