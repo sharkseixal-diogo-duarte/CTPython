@@ -4,10 +4,6 @@ import mediapipe as mp
 import pyautogui
 import numpy as np
 import time
-
-# Suppress TensorFlow warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
 # Configurations
 screen_width, screen_height = pyautogui.size()
 pyautogui.FAILSAFE = False
@@ -100,3 +96,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+#.\.venv\Scripts\activate      
