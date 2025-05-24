@@ -1,86 +1,102 @@
+import os
 import cv2
 import mediapipe as mp
 import pyautogui
 import numpy as np
 import time
 
-# Configurações iniciais
+# Suppress TensorFlow warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+# Configurations
 screen_width, screen_height = pyautogui.size()
 pyautogui.FAILSAFE = False
 
-# Inicializa MediaPipe
-mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, min_detection_confidence=0.5)
+# Face mesh points for blink detection (eyes)
+UPPER_LID = [159, 386]  # upper eyelid points
+LOWER_LID = [145, 374]  # lower eyelid points
 
-# Índices dos pontos dos olhos
-LEFT_EYE = [33, 133]  # canto interno e externo do olho esquerdo
-RIGHT_EYE = [362, 263]  # canto interno e externo do olho direito
-UPPER_LID = [159, 386]  # parte de cima dos olhos (para detecção de piscada)
-LOWER_LID = [145, 374]  # parte de baixo dos olhos
+# Iris center landmarks (MediaPipe face mesh with refine_landmarks=True)
+LEFT_IRIS_CENTER = 468
+RIGHT_IRIS_CENTER = 473
 
-# Função para detectar piscada
+# Thresholds and cooldown
+BLINK_THRESHOLD = 3.5      # EAR threshold for blink detection
+CLICK_COOLDOWN = 1.0       # seconds between clicks
+
 def eye_aspect_ratio(upper, lower):
+    """Calculate vertical distance between upper and lower eyelid points."""
     return np.linalg.norm(upper - lower)
 
-cap = cv2.VideoCapture(0)
+def main():
+    cap = cv2.VideoCapture(0)
+    last_click_time = 0
 
-blink_threshold = 3.5  # limiar para detectar piscada (ajuste se necessário)
-click_cooldown = 1  # segundos entre cliques
-last_click_time = 0
+    mp_face_mesh = mp.solutions.face_mesh
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+    # Enable refine_landmarks=True to include iris landmarks
+    with mp_face_mesh.FaceMesh(
+        static_image_mode=False,
+        max_num_faces=1,
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5,
+        refine_landmarks=True
+    ) as face_mesh:
 
-    frame = cv2.flip(frame, 1)
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    img_h, img_w, _ = frame.shape
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-    results = face_mesh.process(rgb_frame)
+            frame = cv2.flip(frame, 1)
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img_h, img_w, _ = frame.shape
 
-    if results.multi_face_landmarks:
-        mesh_points = results.multi_face_landmarks[0].landmark
+            results = face_mesh.process(rgb_frame)
 
-        # Coordenadas dos olhos
-        left_eye = np.array([
-            [mesh_points[LEFT_EYE[0]].x * img_w, mesh_points[LEFT_EYE[0]].y * img_h],
-            [mesh_points[LEFT_EYE[1]].x * img_w, mesh_points[LEFT_EYE[1]].y * img_h]
-        ])
-        right_eye = np.array([
-            [mesh_points[RIGHT_EYE[0]].x * img_w, mesh_points[RIGHT_EYE[0]].y * img_h],
-            [mesh_points[RIGHT_EYE[1]].x * img_w, mesh_points[RIGHT_EYE[1]].y * img_h]
-        ])
+            if results and results.multi_face_landmarks:
+                mesh_points = results.multi_face_landmarks[0].landmark
 
-        # Centro dos olhos para controle de cursor
-        eye_center = np.mean(np.concatenate((left_eye, right_eye)), axis=0)
+                # Get iris center coordinates for left and right eyes
+                left_iris = mesh_points[LEFT_IRIS_CENTER]
+                right_iris = mesh_points[RIGHT_IRIS_CENTER]
 
-        # Mapeia para tela
-        screen_x = int((eye_center[0] / img_w) * screen_width)
-        screen_y = int((eye_center[1] / img_h) * screen_height)
-        pyautogui.moveTo(screen_x, screen_y, duration=0.1)
+                # Calculate average iris position (x, y) scaled to image size
+                iris_x = (left_iris.x + right_iris.x) / 2 * img_w
+                iris_y = (left_iris.y + right_iris.y) / 2 * img_h
 
-        # Detecta piscada
-        upper = np.array([
-            [mesh_points[UPPER_LID[0]].x * img_w, mesh_points[UPPER_LID[0]].y * img_h],
-            [mesh_points[UPPER_LID[1]].x * img_w, mesh_points[UPPER_LID[1]].y * img_h]
-        ])
-        lower = np.array([
-            [mesh_points[LOWER_LID[0]].x * img_w, mesh_points[LOWER_LID[0]].y * img_h],
-            [mesh_points[LOWER_LID[1]].x * img_w, mesh_points[LOWER_LID[1]].y * img_h]
-        ])
+                # Map iris position to screen coordinates
+                screen_x = int((iris_x / img_w) * screen_width)
+                screen_y = int((iris_y / img_h) * screen_height)
 
-        ear = eye_aspect_ratio(upper[0], lower[0]) + eye_aspect_ratio(upper[1], lower[1])
+                # Move the cursor to the iris position
+                pyautogui.moveTo(screen_x, screen_y, duration=0.1)
 
-        if ear < blink_threshold and (time.time() - last_click_time) > click_cooldown:
-            pyautogui.click()
-            last_click_time = time.time()
+                # Blink detection using upper and lower eyelid points
+                upper = np.array([
+                    [mesh_points[UPPER_LID[0]].x * img_w, mesh_points[UPPER_LID[0]].y * img_h],
+                    [mesh_points[UPPER_LID[1]].x * img_w, mesh_points[UPPER_LID[1]].y * img_h]
+                ])
+                lower = np.array([
+                    [mesh_points[LOWER_LID[0]].x * img_w, mesh_points[LOWER_LID[0]].y * img_h],
+                    [mesh_points[LOWER_LID[1]].x * img_w, mesh_points[LOWER_LID[1]].y * img_h]
+                ])
 
-    cv2.imshow('Eye Tracker', frame)
+                ear = (eye_aspect_ratio(upper[0], lower[0]) + eye_aspect_ratio(upper[1], lower[1])) / 2
 
-    if cv2.waitKey(1) == 27:  # ESC para sair
-        break
+                current_time = time.time()
+                if ear < BLINK_THRESHOLD and (current_time - last_click_time) > CLICK_COOLDOWN:
+                    pyautogui.click()
+                    last_click_time = current_time
 
-cap.release()
-cv2.destroyAllWindows()
-# .\.venv\Scripts\activate
+            # Show the camera feed window
+            cv2.imshow('Eye Tracker - Iris Cursor & Blink Click', frame)
+
+            if cv2.waitKey(1) & 0xFF == 27:  # ESC to exit
+                break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
