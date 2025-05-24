@@ -18,7 +18,7 @@ RIGHT_IRIS_CENTER = 473
 
 # Thresholds and cooldown
 BLINK_THRESHOLD = 3.5      # EAR threshold for blink detection
-CLICK_COOLDOWN = 1.0       # seconds between clicks
+CLICK_COOLDOWN = 0.5       # seconds between clicks
 
 def eye_aspect_ratio(upper, lower):
     """Calculate vertical distance between upper and lower eyelid points."""
