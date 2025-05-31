@@ -1,33 +1,35 @@
 import cv2
+import numpy as np
 import pyautogui
-eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_eye.xml")
+import time
 
-webcam = cv2.VideoCapture(0)
+# Região da tela onde está o jogo (ajuste conforme sua tela)
+# Exemplo: (left, top, width, height)
+game_area = (300, 400, 600, 150)
+
+# Aguarda 3 segundos antes de iniciar
+print("Iniciando em 3 segundos...")
+time.sleep(3)
+print("Bot rodando...")
 
 while True:
-
-    ret, frame = webcam.read()
-
+    # Captura de tela da região do jogo
+    screenshot = pyautogui.screenshot(region=game_area)
+    frame = np.array(screenshot)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV)
 
-    eyes = eye_cascade.detectMultiScale(gray, 1.3 ,5)
-    UPPER_LID = [159, 386]  # upper eyelid points
-    LOWER_LID = [145, 374]  # lower eyelid points
+    # Região onde o obstáculo costuma aparecer (área da frente do dinossauro)
+    obstacle_area = thresh[60:120, 250:300]
 
-    # Iris center landmarks (MediaPipe face mesh with refine_landmarks=True)
-    LEFT_IRIS_CENTER = 468
-    RIGHT_IRIS_CENTER = 473
+    # Conta os pixels brancos (que representam os obstáculos)
+    obstacle_pixels = cv2.countNonZero(obstacle_area)
 
-    # Thresholds and cooldown
-    BLINK_THRESHOLD = 3.5  # EAR threshold for blink detection
-    CLICK_COOLDOWN = 0.5  # seconds between clicks
+    if obstacle_pixels > 100:
+        pyautogui.press("space")  # Dino pula
+        print("Pulo!")
 
-    for(x,y,w,h) in eyes:
-
-        cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),3)
-
-    pyautogui.moveTo(UPPER_LID, LOWER_LID, duration=0.1)
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-    cv2.imshow("face and eyes detector",frame)
+    # Apenas para controle de visualização (remover se quiser rodar mais leve)
+    # cv2.imshow("Obstacle Area", obstacle_area)
+    # if cv2.waitKey(1) == ord('q'):
+    #     break
