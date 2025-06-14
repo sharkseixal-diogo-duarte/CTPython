@@ -42,6 +42,7 @@ try:
             obstacle_pixels_white = cv2.countNonZero(obstacle_area)
             pyautogui.press("space")
         cv2.imshow("Área de Detecção", thresh)
+        print("Pixels detectados:", obstacle_pixels_white)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
