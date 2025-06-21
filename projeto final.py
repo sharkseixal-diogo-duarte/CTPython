@@ -3,7 +3,6 @@ import numpy as np
 import pyautogui
 import time
 import keyboard
-#https://chrome-dino-game.github.io/
 test_area = (400, 150, 220, 150)
 pyautogui.press("win")
 time.sleep(0.7)
