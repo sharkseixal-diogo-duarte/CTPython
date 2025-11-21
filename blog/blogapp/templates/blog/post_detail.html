@@ -1,0 +1,25 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.body }}</p>
+    <p><i>Publicado por {{ post.author.username}} em {{ post.created_at}}</i></p>
+
+    <hr>
+    <h3>Comentários</h3>
+    {% for comment in post.comments.all %}
+    <p><strong>{{ comment.author.username }}</strong>: {{comment.text }}</p>
+    {% empty %}
+        <p> No Comments For Now ... </p>
+    {% endfor %}
+
+    {% if user.authenticated %}
+        <h4>Adicionar Comentário</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="Submit">Publicar</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}?next={{ request.path }}">faz login para poderes comentar</a></p>
+    {% endif %}
+{% endblock %}
