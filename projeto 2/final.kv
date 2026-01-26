@@ -1,0 +1,182 @@
+<RegisterScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 20
+        spacing: 10
+
+        Label:
+            text: "Criar Conta"
+            font_size: 28
+
+        TextInput:
+            id: reg_user
+            hint_text: "Novo Username"
+            multiline: False
+
+        TextInput:
+            id: reg_pass
+            hint_text: "Nova Password"
+            password: True
+            multiline: False
+
+        Label:
+            id: reg_msg
+            text: ""
+            color: 1,0,0,1
+
+        Button:
+            text: "Registar"
+            on_press: root.register()
+
+        Button:
+            text: "Já tenho conta"
+            on_press: app.root.current = "login"
+        Button:
+            text: "Sair"
+            size_hint_y: None
+            height: 40
+            on_press: app.stop()
+
+
+<LoginScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 20
+        spacing: 10
+
+        Label:
+            text: "Login"
+            font_size: 28
+
+        TextInput:
+            id: user_input
+            hint_text: "Username"
+            multiline: False
+
+        TextInput:
+            id: pass_input
+            hint_text: "Password"
+            password: True
+            multiline: False
+
+        Label:
+            id: login_msg
+            text: ""
+            color: 1,0,0,1
+
+        Button:
+            text: "Entrar"
+            on_press: root.do_login()
+
+        Button:
+            text: "Criar Conta"
+            on_press: app.root.current = "register"
+
+        Button:
+            text: "Sair"
+            size_hint_y: None
+            height: 40
+            on_press: app.stop()
+
+<TaskItem>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: 40
+    spacing: 5
+
+    Label:
+        text: root.texto
+
+    Label:
+        text: root.prioridade
+
+    Label:
+        text: root.prazo
+
+    Button:
+        text: "Remover"
+        size_hint_x: 0.3
+        on_press: root.remove_task(self)
+
+
+<FinalLayout>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 10
+        spacing: 10
+
+        Label:
+            id: relogio
+            text: "00:00:00"
+            font_size: 32
+            size_hint_y: None
+            height: 50
+
+        Label:
+            text: root.calendario
+            font_size: 18
+            halign: "center"
+            valign: "middle"
+            text_size: self.size
+            size_hint_y: None
+            height: 200
+
+        Label:
+            text: root.notificacao
+            color: 1, 0, 0, 1
+            font_size: 18
+            size_hint_y: None
+            height: 40
+
+        BoxLayout:
+            size_hint_y: 0.5
+            height: 0.1
+            padding: 10
+
+            Button:
+                text: "Sair"
+                size_hint_y: None
+                center_x: 100
+                center_y: 100
+                height: 40
+                on_press: app.stop()
+
+        BoxLayout:
+            size_hint_y: None
+            height: 40
+            spacing: 5
+
+            TextInput:
+                id: texto_input
+                hint_text: "Tarefa"
+                multiline: False
+
+            TextInput:
+                id: prioridade_input
+                hint_text: "Prioridade"
+                multiline: False
+
+            TextInput:
+                id: prazo_input
+                hint_text: "Prazo (YYYY-MM-DD)"
+                multiline: False
+
+            Button:
+                text: "Adicionar"
+                size_hint_x: None
+                width: 100
+                on_press:
+                    root.adicionar_tarefa(texto_input.text, prioridade_input.text, prazo_input.text)
+                    texto_input.text = ""
+                    prioridade_input.text = ""
+                    prazo_input.text = ""
+
+        RecycleView:
+            id: lista_tarefas
+            viewclass: "TaskItem"
+            RecycleBoxLayout:
+                default_size: None, dp(40)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: "vertical"
