@@ -1,31 +1,30 @@
 import speech_recognition as sr
 from didddy import diddy
 
-PALAVRA_CHAVE = "ativar"
-Sair = "sair"
 r = sr.Recognizer()
 
 with sr.Microphone() as source:
+    print("A ajustar ao ruído ambiente...")
     r.adjust_for_ambient_noise(source, duration=1)
-    print("...")
+    print(f"A ouvir")
+
     while True:
         try:
             audio = r.listen(source, timeout=5, phrase_time_limit=3)
             texto = r.recognize_google(audio, language="pt-PT").lower()
+            print("Ouvi:", texto)
 
-            if PALAVRA_CHAVE in texto:
-                print(f"{PALAVRA_CHAVE} diddy")
-                print("OI Neu soIu DIDDY G1.0 o queE posso ajudarR")
-                audio_comando = r.listen(source, timeout=5)
-                comando = r.recognize_google(audio_comando, language="pt-PT")
+            if texto == "vídeo":
+                diddy.youtube()
 
-                if comando == "vídeo":
-                    diddy.youtube()
+            elif texto == "código":
+                diddy.github()
 
-                if Sair in comando:
-                    print(".")
-                    break
-
+            elif texto == "sair":
+                print("Comando de saída recebido. A desligar...")
+                break
+            else:
+                print("Comando desconhecido. Tenta novamente.")
 
         except sr.WaitTimeoutError:
             pass
@@ -34,4 +33,4 @@ with sr.Microphone() as source:
             pass
 
         except sr.RequestError as e:
-            print("Erro no serviço:", e)
+            print("Erro no serviço de reconhecimento de voz:", e)
