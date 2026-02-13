@@ -14,13 +14,13 @@ with sr.Microphone() as source:
             texto = r.recognize_google(audio, language="pt-PT").lower()
             print("Ouvi:", texto)
 
-            if texto == "vídeo":
+            if texto in "vídeo":
                 diddy.youtube()
 
-            elif texto == "código":
+            elif texto in "código":
                 diddy.github()
 
-            elif texto == "sair":
+            elif texto in "mal":
                 print("Comando de saída recebido. A desligar...")
                 break
             else:
