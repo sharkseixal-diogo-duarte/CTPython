@@ -1,6 +1,6 @@
 import speech_recognition as sr
 from didddy import diddy
-
+# 428855
 # 492506
 def executar_comando(texto: str):
     if "vídeo" in texto:
@@ -60,3 +60,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
