@@ -1,7 +1,7 @@
 import speech_recognition as sr
 from didddy import diddy
 
-
+# 492506
 def executar_comando(texto: str):
     if "vídeo" in texto:
         diddy.youtube()
